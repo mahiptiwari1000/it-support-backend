@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const Ticket = require('../models/Ticket');
-const TicketSchema = require('../models/TicketSchema');
 
 // GET all tickets for a specific user
 router.get('/tickets', async (req, res) => {
@@ -122,15 +121,21 @@ router.get('/search', async (req, res) => {
 });
 
 
-router.post('/ticketdetails', async (req, res) => {
+router.post('/tickets', async (req, res) => {
     try {
       const {
         arNumber,
         title,
         description,
+        emailAddress,
+        fullName,
         severity,
         priority,
+        product,
+        subProduct,
         status,
+        assignee,
+        assigneeEmail,
         userId,
         resolutionNotes,
         role, // Assuming role is sent in the request body to determine if the user is ITStaff
@@ -140,7 +145,7 @@ router.post('/ticketdetails', async (req, res) => {
       if (!userId) {
         return res.status(400).json({ error: 'UserId is required' });
       }
-      if (!arNumber || !description || !severity || !priority || !status ) {
+      if (!arNumber || !title || !description || !emailAddress || !fullName || !severity || !priority || !product || !subProduct || !status || !assignee || !assigneeEmail) {
         return res.status(400).json({ error: 'All mandatory fields are required' });
       }
   
@@ -149,12 +154,16 @@ router.post('/ticketdetails', async (req, res) => {
         arNumber,
         title,
         description,
+        emailAddress,
+        fullName,
         severity,
         priority,
+        product,
+        subProduct,
         status,
+        assignee,
+        assigneeEmail,
         userId,
-        resolutionNotes,
-        role,
       };
   
       if (role === 'ITStaff' && resolutionNotes) {
@@ -162,7 +171,7 @@ router.post('/ticketdetails', async (req, res) => {
       }
   
       // Create a new ticket instance
-      const newTicket = new TicketSchema(ticketData);
+      const newTicket = new Ticket(ticketData);
       const savedTicket = await newTicket.save();
   
       // Respond with the saved ticket
@@ -171,6 +180,7 @@ router.post('/ticketdetails', async (req, res) => {
       console.error('Error creating ticket:', error);
       res.status(500).json({ error: 'Failed to create ticket' });
     }
-  });      
+  });
+      
 
 module.exports = router;
