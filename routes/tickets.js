@@ -35,6 +35,8 @@ router.post('/tickets', async (req, res) => {
 
 // GET all tickets or search by arNumber
 router.get('/search', async (req, res) => {
+    console.log("calling this search api");
+    
     try {
         const {
             arNumber,
@@ -46,12 +48,17 @@ router.get('/search', async (req, res) => {
             startDate,
             endDate,
             product,
-            subProduct
+            subProduct,
+            userId
         } = req.query;
+        
+        if(!userId){
+            return res.status(400).json({ error: 'userId is required' });
+        }
 
         // Build the query object dynamically
         const query = {};
-
+        query.userId = userId;
         // Filter by AR number (partial match, case-insensitive)
         if (arNumber) {
             query.arNumber = new RegExp(arNumber, 'i'); // Case-insensitive regex match
@@ -84,12 +91,12 @@ router.get('/search', async (req, res) => {
 
         // Filter by date range
         if (startDate || endDate) {
-            query.createdAt = {};
+            query.dateCreated = {};
             if (startDate) {
-                query.createdAt.$gte = new Date(startDate); // Greater than or equal to startDate
+                query.dateCreated.$gte = new Date(startDate); // Greater than or equal to startDate
             }
             if (endDate) {
-                query.createdAt.$lte = new Date(endDate); // Less than or equal to endDate
+                query.dateCreated.$lte = new Date(endDate); // Less than or equal to endDate
             }
         }
 
@@ -102,10 +109,9 @@ router.get('/search', async (req, res) => {
         if (subProduct) {
             query.subProduct = subProduct;
         }
-
+        
         // Fetch tickets from the database based on the query
         const tickets = await Ticket.find(query);
-        console.log(tickets, "filtered tickets");
 
         res.json(tickets);
     } catch (err) {
