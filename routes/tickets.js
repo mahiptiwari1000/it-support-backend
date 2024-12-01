@@ -120,6 +120,66 @@ router.get('/search', async (req, res) => {
     }
 });
 
-    
+
+router.post('/ticketdetails', async (req, res) => {
+    try {
+      const {
+        arNumber,
+        title,
+        description,
+        emailAddress,
+        fullName,
+        severity,
+        priority,
+        product,
+        subProduct,
+        status,
+        assignee,
+        assigneeEmail,
+        userId,
+        resolutionNotes,
+        role, // Assuming role is sent in the request body to determine if the user is ITStaff
+      } = req.body;
+  
+      // Validate mandatory fields
+      if (!userId) {
+        return res.status(400).json({ error: 'UserId is required' });
+      }
+      if (!arNumber || !title || !description || !emailAddress || !fullName || !severity || !priority || !product || !subProduct || !status || !assignee || !assigneeEmail) {
+        return res.status(400).json({ error: 'All mandatory fields are required' });
+      }
+  
+      // Conditionally include resolutionNotes based on role
+      const ticketData = {
+        arNumber,
+        title,
+        description,
+        emailAddress,
+        fullName,
+        severity,
+        priority,
+        product,
+        subProduct,
+        status,
+        assignee,
+        assigneeEmail,
+        userId,
+      };
+  
+      if (role === 'ITStaff' && resolutionNotes) {
+        ticketData.resolutionNotes = resolutionNotes; // Only allow resolutionNotes for ITStaff
+      }
+  
+      // Create a new ticket instance
+      const newTicket = new Ticket(ticketData);
+      const savedTicket = await newTicket.save();
+  
+      // Respond with the saved ticket
+      res.status(201).json(savedTicket);
+    } catch (error) {
+      console.error('Error creating ticket:', error);
+      res.status(500).json({ error: 'Failed to create ticket' });
+    }
+  });      
 
 module.exports = router;
