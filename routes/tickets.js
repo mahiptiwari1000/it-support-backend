@@ -128,15 +128,9 @@ router.post('/ticketdetails', async (req, res) => {
         arNumber,
         title,
         description,
-        emailAddress,
-        fullName,
         severity,
         priority,
-        product,
-        subProduct,
         status,
-        assignee,
-        assigneeEmail,
         userId,
         resolutionNotes,
         role, // Assuming role is sent in the request body to determine if the user is ITStaff
@@ -146,7 +140,7 @@ router.post('/ticketdetails', async (req, res) => {
       if (!userId) {
         return res.status(400).json({ error: 'UserId is required' });
       }
-      if (!arNumber || !title || !description || !emailAddress || !fullName || !severity || !priority || !product || !subProduct || !status || !assignee || !assigneeEmail) {
+      if (!arNumber || !description || !severity || !priority || !status ) {
         return res.status(400).json({ error: 'All mandatory fields are required' });
       }
   
@@ -155,16 +149,12 @@ router.post('/ticketdetails', async (req, res) => {
         arNumber,
         title,
         description,
-        emailAddress,
-        fullName,
         severity,
         priority,
-        product,
-        subProduct,
         status,
-        assignee,
-        assigneeEmail,
         userId,
+        resolutionNotes,
+        role,
       };
   
       if (role === 'ITStaff' && resolutionNotes) {
