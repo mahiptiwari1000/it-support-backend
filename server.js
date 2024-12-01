@@ -32,7 +32,11 @@ app.get('/', (req, res) => {
   res.send(`Welcome to the IT Support App Backend! Running at ${BASE_URL}`);
 });
 
-// Start the server
-app.listen(PORT, () => {
-  console.log(`Server running on ${BASE_URL}`);
-});
+// Commenting the listen part for deployment on vercel
+// app.listen(PORT, () => {
+//   console.log(`Server running on ${BASE_URL}`);
+// });
+
+
+// Commenting the export part for testing on development environment
+module.exports = app;
