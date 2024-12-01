@@ -34,7 +34,7 @@ router.post('/tickets', async (req, res) => {
 });
 
 // GET all tickets or search by arNumber
-router.get('/tickets/search', async (req, res) => {
+router.get('/search', async (req, res) => {
     try {
       const { arNumber } = req.query;
       const query = arNumber ? { arNumber: new RegExp(arNumber, 'i') } : {};
