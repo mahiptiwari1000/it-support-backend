@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Ticket = require('../models/Ticket');
+const TicketSchema = require('../models/TicketSchema');
 
 // GET all tickets for a specific user
 router.get('/tickets', async (req, res) => {
@@ -171,7 +172,7 @@ router.post('/ticketdetails', async (req, res) => {
       }
   
       // Create a new ticket instance
-      const newTicket = new Ticket(ticketData);
+      const newTicket = new TicketSchema(ticketData);
       const savedTicket = await newTicket.save();
   
       // Respond with the saved ticket
