@@ -9,6 +9,9 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5001;
 
+// Define the base URL dynamically based on the environment
+const BASE_URL = process.env.BASE_URL || `http://localhost:${PORT}`;
+
 app.use(cors());
 app.use(express.json());
 
@@ -26,9 +29,10 @@ mongoose
 
 // Define a route to handle GET requests to the root URL
 app.get('/', (req, res) => {
-  res.send('Welcome to the IT Support App Backend!');
+  res.send(`Welcome to the IT Support App Backend! Running at ${BASE_URL}`);
 });
 
+// Start the server
 app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+  console.log(`Server running on ${BASE_URL}`);
 });
