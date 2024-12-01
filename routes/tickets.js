@@ -36,8 +36,8 @@ router.post('/tickets', async (req, res) => {
 // GET all tickets or search by arNumber
 router.get('/search', async (req, res) => {
     try {
-      const { arNumber } = req.query;
-      const query = arNumber ? { arNumber: new RegExp(arNumber, 'i') } : {};
+      const { arNumber, userId } = req.query;
+      const query = { arNumber: new RegExp(arNumber, 'i'), userId: userId };
       const tickets = await Ticket.find(query);
       console.log(tickets, " filtered tickets");
       
