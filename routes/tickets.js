@@ -121,7 +121,7 @@ router.get('/search', async (req, res) => {
 });
 
 
-router.post('/tickets', async (req, res) => {
+router.post('/ticketdetails', async (req, res) => {
     try {
       const {
         arNumber,
