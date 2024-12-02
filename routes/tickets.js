@@ -136,43 +136,58 @@ router.get('/ticketdetails', async (req, res) => {
 
 // POST new ticket details with file saved directly to MongoDB
 router.post('/ticketdetails', upload.single('attachment'), async (req, res) => {
-  try {
-    const {
-      arNumber,
-      priority,
-      severity,
-      status,
-      description,
-      progressLog,
-      resolutionNotes,
-      userId,
-    } = req.body;
-
-    // Validate required fields
-    if (!arNumber || !priority || !severity || !status || !userId) {
-      return res.status(400).json({ error: 'Missing required fields' });
+    try {
+      const {
+        arNumber,
+        priority,
+        severity,
+        status,
+        description,
+        progressLog,
+        resolutionNotes,
+        userId,
+      } = req.body;
+  
+      // Validate required fields
+      if (!arNumber || !priority || !severity || !status || !userId) {
+        return res.status(400).json({ error: 'Missing required fields' });
+      }
+  
+      // Validate and parse progressLog
+      let parsedProgressLog = [];
+      if (progressLog) {
+        try {
+          parsedProgressLog = JSON.parse(progressLog); // Attempt to parse as JSON
+          if (!Array.isArray(parsedProgressLog)) {
+            throw new Error('progressLog must be an array');
+          }
+        } catch (parseError) {
+          console.error('Invalid progressLog format:', parseError);
+          return res.status(400).json({ error: 'Invalid progressLog format' });
+        }
+      }
+  
+      // Create a new ticket details object
+      const newTicketDetails = new Ticket({
+        arNumber,
+        priority,
+        severity,
+        status,
+        description,
+        progressLog: parsedProgressLog,
+        resolutionNotes,
+        userId,
+        attachment: req.file ? req.file.buffer : null, // Save file as Buffer
+        attachmentType: req.file ? req.file.mimetype : null, // Save file type for retrieval
+      });
+  
+      const savedTicketDetails = await newTicketDetails.save();
+      res.status(201).json(savedTicketDetails);
+    } catch (error) {
+      console.error('Error creating ticket details:', error);
+      res.status(500).json({ error: 'Failed to create ticket details' });
     }
-
-    // Create a new ticket details object
-    const newTicketDetails = new Ticket({
-      arNumber,
-      priority,
-      severity,
-      status,
-      description,
-      progressLog: progressLog ? JSON.parse(progressLog) : [], // Parse progressLog if provided
-      resolutionNotes,
-      userId,
-      attachment: req.file ? req.file.buffer : null, // Save file as Buffer
-      attachmentType: req.file ? req.file.mimetype : null, // Save file type for retrieval
-    });
-
-    const savedTicketDetails = await newTicketDetails.save();
-    res.status(201).json(savedTicketDetails);
-  } catch (error) {
-    console.error('Error creating ticket details:', error);
-    res.status(500).json({ error: 'Failed to create ticket details' });
-  }
-});
+  });
+  
 
 module.exports = router;
