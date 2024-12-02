@@ -12,7 +12,11 @@ const PORT = process.env.PORT || 5001;
 // Define the base URL dynamically based on the environment
 const BASE_URL = process.env.BASE_URL || `http://localhost:${PORT}`;
 
-app.use(cors());
+app.use(cors({
+    origin: 'https://main.d3auyg61sr8gu7.amplifyapp.com', // Allow requests from the Amplify app
+    methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allowed methods
+    credentials: true, // Include credentials (if needed)
+  }));
 app.use(express.json());
 
 // Use ticket routes
