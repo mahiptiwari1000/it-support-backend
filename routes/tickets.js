@@ -2,7 +2,7 @@ const express = require('express');
 const multer = require('multer');
 const router = express.Router();
 const Ticket = require('../models/Ticket');
-const TicketDetailsSchema = require('..models/TicketDetails');
+const TicketDetailsSchema = require('../models/TicketDetailsSchema');
 
 // Configure multer to store file in memory
 const storage = multer.memoryStorage(); // Store files in memory as Buffer
