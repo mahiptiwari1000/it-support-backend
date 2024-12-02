@@ -9,7 +9,7 @@ router.get('/tickets', async (req, res) => {
       if (!userId) {
         return res.status(400).json({ error: 'userId is required' });
       }
-      const query = { userId };
+      const query = { userId:userId };
       if (arNumber) {
         query.arNumber = new RegExp(arNumber, 'i');
       }
