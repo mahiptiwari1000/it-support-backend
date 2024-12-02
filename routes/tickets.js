@@ -134,8 +134,43 @@ router.get('/ticketdetails', async (req, res) => {
   }
 });
 
+const validateTicketDetails = (req, res, next) => {
+    try {
+      const { progressLog } = req.body;
+  
+      // Log the raw progressLog for debugging
+      console.log('Raw progressLog:', progressLog);
+  
+      // Validate progressLog
+      if (progressLog) {
+        let parsedProgressLog;
+  
+        // Parse if it's a string, or verify if it's an array
+        if (typeof progressLog === 'string') {
+          parsedProgressLog = JSON.parse(progressLog);
+        } else if (Array.isArray(progressLog)) {
+          parsedProgressLog = progressLog;
+        } else {
+          throw new Error('progressLog must be a JSON array or stringified JSON array');
+        }
+  
+        // Ensure parsed progressLog is an array
+        if (!Array.isArray(parsedProgressLog)) {
+          throw new Error('progressLog must be an array');
+        }
+  
+        req.body.progressLog = parsedProgressLog; // Replace with parsed array
+      }
+      next();
+    } catch (error) {
+      console.error('Error validating progressLog:', error.message);
+      return res.status(400).json({ error: 'Invalid progressLog format' });
+    }
+  };
+  
+
 // POST new ticket details with file saved directly to MongoDB
-router.post('/ticketdetails', upload.single('attachment'), async (req, res) => {
+router.post('/ticketdetails', upload.single('attachment'), validateTicketDetails, async (req, res) => {
     try {
       const {
         arNumber,
@@ -153,19 +188,8 @@ router.post('/ticketdetails', upload.single('attachment'), async (req, res) => {
         return res.status(400).json({ error: 'Missing required fields' });
       }
   
-      // Validate and parse progressLog
-      let parsedProgressLog = [];
-      if (progressLog) {
-        try {
-          parsedProgressLog = JSON.parse(progressLog); // Attempt to parse as JSON
-          if (!Array.isArray(parsedProgressLog)) {
-            throw new Error('progressLog must be an array');
-          }
-        } catch (parseError) {
-          console.error('Invalid progressLog format:', parseError);
-          return res.status(400).json({ error: 'Invalid progressLog format' });
-        }
-      }
+      // Log validated progressLog
+      console.log('Validated progressLog:', progressLog);
   
       // Create a new ticket details object
       const newTicketDetails = new Ticket({
@@ -174,7 +198,7 @@ router.post('/ticketdetails', upload.single('attachment'), async (req, res) => {
         severity,
         status,
         description,
-        progressLog: parsedProgressLog,
+        progressLog,
         resolutionNotes,
         userId,
         attachment: req.file ? req.file.buffer : null, // Save file as Buffer
@@ -188,6 +212,6 @@ router.post('/ticketdetails', upload.single('attachment'), async (req, res) => {
       res.status(500).json({ error: 'Failed to create ticket details' });
     }
   });
-  
+    
 
 module.exports = router;
