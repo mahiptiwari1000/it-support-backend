@@ -12,12 +12,32 @@ const PORT = process.env.PORT || 5001;
 // Define the base URL dynamically based on the environment
 const BASE_URL = process.env.BASE_URL || `http://localhost:${PORT}`;
 
-app.use(cors({
-    origin: 'https://main.d3auyg61sr8gu7.amplifyapp.com', // use your actual domain name (or localhost), using * is not recommended
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Origin', 'X-Requested-With', 'Accept', 'x-client-key', 'x-client-token', 'x-client-secret', 'Authorization'],
-    credentials: true
-}))
+// CORS configuration
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      const allowedOrigins = [
+        'https://main.d3auyg61sr8gu7.amplifyapp.com', // Production frontend
+        'http://localhost:3000', // Local development frontend
+      ];
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: [
+      'Content-Type',
+      'Origin',
+      'X-Requested-With',
+      'Accept',
+      'Authorization',
+    ],
+    credentials: true, // Allow cookies and credentials
+  })
+);
+
 app.use(express.json());
 
 // Use ticket routes
@@ -37,11 +57,13 @@ app.get('/', (req, res) => {
   res.send(`Welcome to the IT Support App Backend! Running at ${BASE_URL}`);
 });
 
+// Handle preflight requests (for OPTIONS)
+app.options('*', cors());
+
 // Commenting the listen part for deployment on vercel
 // app.listen(PORT, () => {
 //   console.log(`Server running on ${BASE_URL}`);
 // });
-
 
 // Commenting the export part for testing on development environment
 module.exports = app;
