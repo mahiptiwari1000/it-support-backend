@@ -9,11 +9,14 @@ router.get('/tickets', async (req, res) => {
       if (!userId) {
         return res.status(400).json({ error: 'userId is required' });
       }
+      
       const query = { userId:userId };
+
       if (arNumber) {
         query.arNumber = new RegExp(arNumber, 'i');
       }
       const tickets = await Ticket.find(query);
+      console.log(tickets,"tickets");
       res.json(tickets);
     } catch (err) {
       res.status(500).json({ error: 'Failed to fetch tickets' });
