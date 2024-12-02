@@ -2,6 +2,7 @@ const express = require('express');
 const multer = require('multer');
 const router = express.Router();
 const Ticket = require('../models/Ticket');
+const TicketDetailsSchema = require('..models/TicketDetailsSchema');
 
 // Configure multer to store file in memory
 const storage = multer.memoryStorage(); // Store files in memory as Buffer
@@ -126,7 +127,7 @@ router.get('/ticketdetails', async (req, res) => {
       query.arNumber = new RegExp(arNumber, 'i'); // Case-insensitive search for arNumber
     }
 
-    const tickets = await Ticket.find(query);
+    const tickets = await TicketDetailsSchema.find(query);
     res.json(tickets);
   } catch (error) {
     console.error('Error fetching ticket details:', error);
@@ -192,7 +193,7 @@ router.post('/ticketdetails', upload.single('attachment'), validateTicketDetails
       console.log('Validated progressLog:', progressLog);
   
       // Create a new ticket details object
-      const newTicketDetails = new Ticket({
+      const newTicketDetails = new TicketDetailsSchema({
         arNumber,
         priority,
         severity,
