@@ -13,10 +13,11 @@ const PORT = process.env.PORT || 5001;
 const BASE_URL = process.env.BASE_URL || `http://localhost:${PORT}`;
 
 app.use(cors({
-    origin: 'https://main.d3auyg61sr8gu7.amplifyapp.com', // Allow requests from the Amplify app
-    methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allowed methods
-    credentials: true, // Include credentials (if needed)
-  }));
+    origin: '*', // use your actual domain name (or localhost), using * is not recommended
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Origin', 'X-Requested-With', 'Accept', 'x-client-key', 'x-client-token', 'x-client-secret', 'Authorization'],
+    credentials: true
+}))
 app.use(express.json());
 
 // Use ticket routes
