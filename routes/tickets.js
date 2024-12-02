@@ -3,11 +3,9 @@ const multer = require('multer');
 const router = express.Router();
 const Ticket = require('../models/Ticket');
 
-// Configure multer for file uploads
-const upload = multer({
-  dest: 'uploads/', // Specify the folder for file uploads
-  limits: { fileSize: 5 * 1024 * 1024 }, // Limit file size to 5MB
-});
+// Configure multer to store file in memory
+const storage = multer.memoryStorage(); // Store files in memory as Buffer
+const upload = multer({ storage });
 
 // GET all tickets for a specific user
 router.get('/tickets', async (req, res) => {
@@ -136,7 +134,7 @@ router.get('/ticketdetails', async (req, res) => {
   }
 });
 
-// POST new ticket details
+// POST new ticket details with file saved directly to MongoDB
 router.post('/ticketdetails', upload.single('attachment'), async (req, res) => {
   try {
     const {
@@ -165,7 +163,8 @@ router.post('/ticketdetails', upload.single('attachment'), async (req, res) => {
       progressLog: progressLog ? JSON.parse(progressLog) : [], // Parse progressLog if provided
       resolutionNotes,
       userId,
-      attachment: req.file ? req.file.path : null, // Save attachment file path
+      attachment: req.file ? req.file.buffer : null, // Save file as Buffer
+      attachmentType: req.file ? req.file.mimetype : null, // Save file type for retrieval
     });
 
     const savedTicketDetails = await newTicketDetails.save();
