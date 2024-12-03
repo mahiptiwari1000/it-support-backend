@@ -1,5 +1,14 @@
 const mongoose = require('mongoose');
 
+const namesList = ['Mahip', 'Hansika'];
+
+// Step 2: Function to select a random name
+function getRandomName() {
+  const randomIndex = Math.floor(Math.random() * namesList.length);
+  return namesList[randomIndex];
+}
+
+
 const TicketSchema = new mongoose.Schema(
   {
     arNumber: {
@@ -58,6 +67,10 @@ const TicketSchema = new mongoose.Schema(
     assigneeEmail: {
       type: String,
       default: '',
+    },
+    name: {
+      type: String,
+      default: getRandomName,
     },
   },
   { timestamps: true }

@@ -55,6 +55,7 @@ router.post('/tickets', async (req, res) => {
       progressLog,
       product,
       subProduct,
+      name
     } = req.body;
 
     // Validate required fields
@@ -74,6 +75,7 @@ router.post('/tickets', async (req, res) => {
       product,
       subProduct,
       dateUpdated: new Date(),
+      name
     };
 
     // Fetch the existing ticket to append progress logs
