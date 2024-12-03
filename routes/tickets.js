@@ -46,6 +46,7 @@ router.post('/tickets', async (req, res) => {
     const {
       arNumber,
       userId,
+      title,
       priority,
       severity,
       status,
@@ -56,11 +57,14 @@ router.post('/tickets', async (req, res) => {
       subProduct,
     } = req.body;
 
-    if (!arNumber || !userId || !priority || !severity || !status) {
+    // Validate required fields
+    if (!arNumber || !userId || !priority || !severity || !status || !title) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
 
+    // Prepare ticket data
     const ticketData = {
+      title, // Include title
       userId,
       priority,
       severity,
@@ -72,25 +76,32 @@ router.post('/tickets', async (req, res) => {
       dateUpdated: new Date(),
     };
 
+    // Handle progress logs if provided
     if (progressLog) {
-      ticketData.progressLog = progressLog.map(log => ({
+      ticketData.progressLog = progressLog.map((log) => ({
         message: log,
         timestamp: new Date(),
       }));
     }
 
+    // Create or update the ticket
     const ticket = await Ticket.findOneAndUpdate(
       { arNumber },
-      { $set: ticketData, $push: { progressLog: { $each: ticketData.progressLog || [] } } },
-      { new: true, upsert: true }
+      {
+        $set: ticketData,
+        $push: { progressLog: { $each: ticketData.progressLog || [] } }, // Append logs if any
+      },
+      { new: true, upsert: true } // Create if doesn't exist
     );
 
+    // Return the updated or newly created ticket
     res.status(201).json(ticket);
   } catch (error) {
     console.error('Error creating or updating ticket:', error);
     res.status(500).json({ error: 'Failed to create or update ticket' });
   }
 });
+
 
 
 router.get('/search', async (req, res) => {
