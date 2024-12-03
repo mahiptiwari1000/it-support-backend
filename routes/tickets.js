@@ -135,24 +135,28 @@ router.get('/ticketdetails', async (req, res) => {
   try {
     const { arNumber, userId } = req.query;
 
-    // Validate userId
     if (!userId) {
       return res.status(400).json({ error: 'userId is required' });
     }
 
     const query = { userId };
-
     if (arNumber) {
-      query.arNumber = new RegExp(arNumber, 'i'); // Case-insensitive search for arNumber
+      query.arNumber = arNumber; // Filter by arNumber if provided
     }
 
-    const tickets = await TicketDetailsSchema.find(query);
-    res.json(tickets);
+    // Find tickets, sort by `updatedAt` (descending), and return the most recent
+    const tickets = await TicketDetailsSchema.find(query).sort({ updatedAt: -1 });
+    if (!tickets.length) {
+      return res.status(404).json({ error: 'No tickets found' });
+    }
+
+    res.json(tickets[0]); // Return the most recent ticket
   } catch (error) {
     console.error('Error fetching ticket details:', error);
     res.status(500).json({ error: 'Failed to fetch ticket details' });
   }
 });
+
 
 const validateTicketDetails = (req, res, next) => {
     try {
