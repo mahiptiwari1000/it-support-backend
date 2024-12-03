@@ -76,13 +76,19 @@ router.post('/tickets', async (req, res) => {
       dateUpdated: new Date(),
     };
 
-    // Update ticket fields including progressLog
+    // Fetch the existing ticket to append progress logs
+    const existingTicket = await Ticket.findOne({ arNumber });
+
+    // Append the new progressLog as a string
+    const updatedProgressLog = `${existingTicket?.progressLog || ''}\n${progressLog || ''}`.trim();
+
+    // Include the updated progressLog in the ticket data
+    ticketData.progressLog = updatedProgressLog;
+
+    // Update the ticket
     const updatedTicket = await Ticket.findOneAndUpdate(
       { arNumber },
-      {
-        $set: ticketData,
-        $push: { progressLog: progressLog ? `\n${progressLog}\n` : '' }, // Append progress log
-      },
+      { $set: ticketData },
       { new: true, upsert: true }
     );
 
@@ -92,6 +98,7 @@ router.post('/tickets', async (req, res) => {
     res.status(500).json({ error: 'Failed to create or update ticket' });
   }
 });
+
 
 router.get('/search', async (req, res) => {
   try {
