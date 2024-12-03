@@ -55,7 +55,6 @@ router.post('/tickets', async (req, res) => {
       progressLog,
       product,
       subProduct,
-      name
     } = req.body;
 
     // Validate required fields
@@ -75,22 +74,15 @@ router.post('/tickets', async (req, res) => {
       product,
       subProduct,
       dateUpdated: new Date(),
-      name
     };
 
-    // Fetch the existing ticket to append progress logs
-    const existingTicket = await Ticket.findOne({ arNumber });
-
-    // Append the new progressLog as a string
-    const updatedProgressLog = `${existingTicket?.progressLog || ''}\n${progressLog || ''}`.trim();
-
-    // Include the updated progressLog in the ticket data
-    ticketData.progressLog = updatedProgressLog;
-
-    // Update the ticket
+    // Update ticket fields including progressLog
     const updatedTicket = await Ticket.findOneAndUpdate(
       { arNumber },
-      { $set: ticketData },
+      {
+        $set: ticketData,
+        $push: { progressLog: progressLog ? `\n${progressLog}\n` : '' }, // Append progress log
+      },
       { new: true, upsert: true }
     );
 
@@ -100,7 +92,6 @@ router.post('/tickets', async (req, res) => {
     res.status(500).json({ error: 'Failed to create or update ticket' });
   }
 });
-
 
 router.get('/search', async (req, res) => {
   try {
