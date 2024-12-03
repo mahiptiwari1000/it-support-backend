@@ -73,7 +73,8 @@ router.post('/tickets', async (req, res) => {
       resolutionNotes,
       product,
       subProduct,
-      dateUpdated: new Date(),
+      progressLog: '',
+      statusChangeTimestamp: new Date(),
     };
 
     // Fetch the existing ticket to append progress logs
@@ -126,9 +127,9 @@ router.get('/search', async (req, res) => {
     if (priority) query.priority = priority;
     if (status) query.status = status;
     if (startDate || endDate) {
-      query.dateCreated = {};
-      if (startDate) query.dateCreated.$gte = new Date(startDate);
-      if (endDate) query.dateCreated.$lte = new Date(endDate);
+      query.statusChangeTimestamp = {}; // Use statusChangeTimestamp for filtering
+      if (startDate) query.statusChangeTimestamp.$gte = new Date(startDate);
+      if (endDate) query.statusChangeTimestamp.$lte = new Date(endDate);
     }
     if (product) query.product = product;
     if (subProduct) query.subProduct = subProduct;

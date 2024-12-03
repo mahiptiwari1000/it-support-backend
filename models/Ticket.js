@@ -48,6 +48,10 @@ const TicketSchema = new mongoose.Schema(
       type: String,
       default: 'Assigned',
     },
+    statusChangeTimestamp: {
+      type: Date,
+      default: Date.now, // Automatically set the timestamp when the document is created
+    },
     progressLog: {
       type: String,
       default: '',
@@ -67,11 +71,7 @@ const TicketSchema = new mongoose.Schema(
     assigneeEmail: {
       type: String,
       default: '',
-    },
-    name: {
-      type: String,
-      default: getRandomName,
-    },
+    }
   },
   { timestamps: true }
 );
