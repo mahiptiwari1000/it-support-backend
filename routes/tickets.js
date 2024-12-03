@@ -76,29 +76,17 @@ router.post('/tickets', async (req, res) => {
       dateUpdated: new Date(),
     };
 
-    // Update ticket fields excluding progressLog
+    // Update ticket fields including progressLog
     const updatedTicket = await Ticket.findOneAndUpdate(
       { arNumber },
-      { $set: ticketData },
-      { new: true, upsert: true } // Create if doesn't exist
+      {
+        $set: ticketData,
+        $push: { progressLog: progressLog ? `\n${progressLog}\n` : '' }, // Append progress log
+      },
+      { new: true, upsert: true }
     );
 
-    // Handle progressLog updates separately
-    if (progressLog && Array.isArray(progressLog)) {
-      const logEntries = progressLog.map((log) => ({
-        message: log.message,
-        timestamp: new Date(),
-      }));
-
-      await Ticket.updateOne(
-        { arNumber },
-        { $push: { progressLog: { $each: logEntries } } }
-      );
-    }
-
-    // Fetch the updated ticket
-    const finalTicket = await Ticket.findOne({ arNumber });
-    res.status(201).json(finalTicket);
+    res.status(201).json(updatedTicket);
   } catch (error) {
     console.error('Error creating or updating ticket:', error);
     res.status(500).json({ error: 'Failed to create or update ticket' });
