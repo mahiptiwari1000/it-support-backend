@@ -45,6 +45,7 @@ router.get('/tickets', async (req, res) => {
 router.post('/tickets', async (req, res) => {
   try {
     const ticketData = req.body;
+    ticketData.status = ticketData.status || 'Assigned';
     const newTicket = new Ticket(ticketData);
     const savedTicket = await newTicket.save();
     res.status(201).json(savedTicket);
