@@ -41,7 +41,8 @@ const TicketSchema = new mongoose.Schema(
     },
     progressLog: [
       {
-        type: String,
+        message: { type: String, required: true }, // Log message
+        timestamp: { type: Date, required: true }, // When the log was created
       },
     ],
     resolutionNotes: {
